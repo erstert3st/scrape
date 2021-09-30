@@ -2,3 +2,5 @@ requests
 bs4
 colorama
 lxml
+futures
+itertools

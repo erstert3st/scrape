@@ -1,40 +1,13 @@
-'''
-        ___
-    .-``   ``-.
-  .'           '.
- /               |   Utku Sen's
-|      __ __      |   .-. .        .  .             .
-'      /|_/|      '  (   )|       _|_ |            _|_
- |  ___|O_O/___  /    `-. |--. .-. |  |    .-.  .-. |  .-. .--.
-  |/    ___    |/    (   )|  |(   )|  |   (   )(   )| (.-' |
-  (    (___)    )     `-' '  `-`-' `-''---'`-'  `-' `-'`--''
-   |   /|_/|   /             utkusen.com / twitter.com/utkusen
-    |  |._.|  /
-     | |   | /
-      |/   |/
-'''
-
-
 import requests
 from bs4 import BeautifulSoup
 import string
-#import argparse as parser
-#from PIL import Image
-#import pytesseract
-#import re
-#import math
 import os
 from signal import signal, SIGINT #async
 import sys
-#import unicodedata
-#import numpy as np
-#import imutils
-#import cv2
 import argparse
-#from os import listdir
-#from os.path import isfile, join
 from colorama import init
-#from termcolor import colored
+from string import ascii_lowercase
+from itertools import product
 init()
 
 #ToDo, DB handler for codes,  DockerImage, Volume, Image Compare Tool, VPN  
@@ -99,13 +72,17 @@ def next_code_abc(curr_code):
 
     return curr_code
 
-from string import ascii_lowercase
-from itertools import product
-def generateNextALL(code, codeList, counterAbc, counterMultiplier):
-    n = 4
-    x = [''.join(i) for r in range(1,n) for i in product(ascii_lowercase, repeat=r)]
-    print(x)
-    return x
+
+def generateNextAll(code):
+    codeTemp = code
+    print(codeTemp)    
+    codeList = []
+    abcList = [''.join(i) for r in range(1,4) for i in product(ascii_lowercase, repeat=r)]    
+    for abcVal in abcList:
+        codeList.append(codeTemp + abcVal)
+    #print(codeList)
+    return codeList
+
 def generateNext26(code, codeList, counterAbc, counterMultiplier):
    # print("---------")
     codeTemp = ""
@@ -145,19 +122,14 @@ def get_img(url, path):
 
 def action(code,imagedir,no_entropy,no_cc,no_keyword):
     print(code)
-    codeList = [code]
-    counterAbc = 0
-    counterMultiplier = 53
-
-    while True:
-        codeListTuble = generateNext26(code, codeList, counterAbc, counterMultiplier)
-        codeList = codeListTuble[0]
-        counterMultiplier = codeListTuble[1]
-        counterAbc +=1
-        for currentCode in codeList:
-            print(currentCode)
-           # print(counterAbc) 
- 
+    codeTemp = code
+    zaeler = ['1']
+    for val in zaeler:
+        codeTemp = codeTemp[:-1]
+        print(codeTemp)
+        codeListDone = generateNextAll(codeTemp)
+       
+        for currentCode in codeListDone:
             try:
                 print(os.getcwd()+"/output/"+currentCode)
                 img_path = os.getcwd()+"/output/"+currentCode
@@ -170,7 +142,6 @@ def action(code,imagedir,no_entropy,no_cc,no_keyword):
 
 signal(SIGINT, handler)
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--code', action='store', dest='code', help='Start code for prnt.sc', required=True)
 parser.add_argument('--imagedir', action='store', dest='imagedir', help='Image directory for logo search', default=None)
@@ -178,7 +149,6 @@ parser.add_argument('--no-entropy', action='store_true', dest='no_entropy', help
 parser.add_argument('--no-cc', action='store_true', dest='no_cc', help="Don't search for credit card", default=None)
 parser.add_argument('--no-keyword', action='store_true', dest='no_keyword', help="Don't search for keywords", default=None)
 argv = parser.parse_args()
-
 
 if argv.no_entropy:
     argv.no_entropy = True
